@@ -1,9 +1,7 @@
 # Juso
 
-<p align="center">
+<p align="center" style="max-width: 60%;">
   <img style="" src="misc/juso.png" alt="juso"/>
-
-  Juso
 </p>
 
 Juso is simple, fast and explicit JSON Serializer
