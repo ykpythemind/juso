@@ -3,14 +3,22 @@ name: Ruby
 on: [push, pull_request]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    strategy:
+      matrix:
+        ruby-version: [3.0.x, 2.7.x, 2.6.x, 2.5.x]
+
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Ruby
+
+      - name: Set up Ruby ${{ matrix.ruby-version }}
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.0.2
+          ruby-version: ${{ matrix.ruby-version }}
           bundler-cache: true
+
       - name: Run test
         run: bundle exec rake test
