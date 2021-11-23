@@ -13,6 +13,7 @@ gemfile(true) do
 
   gem "active_model_serializers"
   gem "activerecord", "6.1.3"
+  gem 'alba'
   gem "juso", path: '../'
   gem "benchmark-ips"
   gem "benchmark-memory"
@@ -104,6 +105,24 @@ class Post
   def juso_json(context)
     {id: id, body: body, commenter_names: commenter_names, commenters: comments.to_a}
   end
+end
+
+# --- Alba serializers ---
+
+require "alba"
+
+class AlbaCommentResource
+  include ::Alba::Resource
+  attributes :id, :body
+end
+
+class AlbaPostResource
+  include ::Alba::Resource
+  attributes :id, :body
+  attribute :commenter_names do |post|
+    post.commenters.pluck(:name)
+  end
+  many :comments, resource: AlbaCommentResource
 end
 
 # --- ActiveModelSerializer serializers ---
@@ -342,18 +361,18 @@ post.reload
 
 juso = Proc.new { Juso.generate(post) }
 
-# alba = Proc.new { AlbaPostResource.new(post).serialize }
-# alba_inline = Proc.new do
-#   Alba.serialize(post) do
-#     attributes :id, :body
-#     attribute :commenter_names do |post|
-#       post.commenters.pluck(:name)
-#     end
-#     many :comments do
-#       attributes :id, :body
-#     end
-#   end
-# end
+alba = Proc.new { AlbaPostResource.new(post).serialize }
+alba_inline = Proc.new do
+  Alba.serialize(post) do
+    attributes :id, :body
+    attribute :commenter_names do |post|
+      post.commenters.pluck(:name)
+    end
+    many :comments do
+      attributes :id, :body
+    end
+  end
+end
 ams = Proc.new { AMSPostSerializer.new(post, {}).to_json }
 blueprinter = Proc.new { PostBlueprint.render(post) }
 jbuilder = Proc.new { post.to_builder.target! }
@@ -371,8 +390,8 @@ simple_ams = Proc.new { SimpleAMS::Renderer.new(post, serializer: SimpleAMSPostS
 
 puts "Serializer outputs ----------------------------------"
 {
-  # alba: alba,
-  # alba_inline: alba_inline,
+  alba: alba,
+  alba_inline: alba_inline,
   juso: juso,
   ams: ams,
   blueprinter: blueprinter,
@@ -391,8 +410,8 @@ puts "Serializer outputs ----------------------------------"
 
 require 'benchmark/ips'
 Benchmark.ips do |x|
-  # x.report(:alba, &alba)
-  # x.report(:alba_inline, &alba_inline)
+  x.report(:alba, &alba)
+  x.report(:alba_inline, &alba_inline)
   x.report(:juso, &juso)
   x.report(:ams, &ams)
   x.report(:blueprinter, &blueprinter)
@@ -412,8 +431,8 @@ end
 
 require 'benchmark/memory'
 Benchmark.memory do |x|
-  # x.report(:alba, &alba)
-  # x.report(:alba_inline, &alba_inline)
+  x.report(:alba, &alba)
+  x.report(:alba_inline, &alba_inline)
   x.report(:juso, &juso)
   x.report(:ams, &ams)
   x.report(:blueprinter, &blueprinter)
