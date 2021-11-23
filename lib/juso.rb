@@ -7,8 +7,6 @@ require 'json'
 module Juso
   class Error < StandardError; end
 
-  COLLECTION_CLASSES = defined?(ActiveRecord) ? [Array, ActiveRecord::Relation] : [Array]
-
   module Serializable
     def as_juso_json(_)
       nil
@@ -41,7 +39,7 @@ module Juso
     when Serializable
       # respond_to?(:as_juso_json) のほうが良い可能性ある？
       return _generate(object.as_juso_json(context), context)
-    when *COLLECTION_CLASSES
+    when *collection_classes
       return object.to_a.map { |o| _generate(o, context) }
     else
       # puts object
@@ -49,4 +47,19 @@ module Juso
       raise Error.new("cannot serialize object: #{object}. you must include Juso::Serializable")
     end
   end
+
+  def self.collection_classes
+    @collection_classes
+  end
+
+  def self.reset_collection_classes
+    @collection_classes =
+      if defined?(ActiveRecord)
+        [Array, ActiveRecord::Relation, ActiveRecord::Associations::CollectionProxy]
+      else
+        [Array]
+      end
+  end
+
+  reset_collection_classes
 end

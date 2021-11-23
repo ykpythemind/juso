@@ -1,6 +1,14 @@
 # Juso
 
-Juso is JSON Serializer
+<p align="center">
+  <img style="" src="misc/juso.png" alt="juso"/>
+
+  Juso
+</p>
+
+Juso is simple, fast and explicit JSON Serializer
+
+<small>Juso means 13 (thirteen) in Japanese</small>
 
 ## Installation
 
@@ -20,31 +28,28 @@ Or install it yourself as:
 
 ## Usage
 
-1. include `Juso::Serializable`
-2. define as_juso_json(context) method
+1. Include `Juso::Serializable`
+2. Define as_juso_json(context) method
+3. Use Juso.generate(object) method
 
 ```ruby
-class User
+class User < ApplicationRecord
   include Juso::Serializable
 
   # ...
 
   def as_juso_json(context)
-    h = {
+    {
       id: id,
       nickname: nickname,
     }
-
-    if context.serializer_type == :admin
-      h[:email] = email
-    end
-
-    h
   end
 end
 
-class Team
+class Team < ApplicationRecord
   include Juso::Serializable
+
+  has_many :users
 
   # ...
 
@@ -56,10 +61,29 @@ class Team
     }
   end
 end
+```
 
+```ruby
 team = Team.first!
 Juso.generate(team)
+=> {"id":1, name: "team name", users: [{id:1,nickname:"hoge"},{id:2,nickname:"piyo"}]}
 ```
+
+### Rule of juso
+
+#### Japanese
+
+as_juso_json メソッドは以下のインスタンスしか返してはいけません
+
+- Numeric Class
+- String Class
+- Null Class
+- Hash Class
+- Array Class
+- Juso::Serializable をinclude したクラス
+- Date / DateTime / ActiveSupport::TimeWithZone
+
+再帰的にjusoの処理が適用されるため、Arrayの要素やHashのvalueも同様のルールが適用されます
 
 ## Development
 

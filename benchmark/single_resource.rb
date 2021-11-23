@@ -90,6 +90,8 @@ end
 # --- Juso serializers ---
 
 require "juso"
+require 'active_record' # hack for CollectionProxy
+Juso.reset_collection_classes
 
 class Comment
   include ::Juso::Serializable
@@ -103,7 +105,7 @@ class Post
   include ::Juso::Serializable
 
   def as_juso_json(context)
-    {id: id, body: body, commenter_names: commenter_names, comments: comments.to_a}
+    {id: id, body: body, commenter_names: commenter_names, comments: comments}
   end
 end
 
@@ -359,7 +361,11 @@ post.reload
 
 # --- Store the serializers in procs ---
 
-juso = Proc.new { Juso.generate(post) }
+juso = Proc.new do
+  Juso.generate(post)
+rescue
+  binding.irb
+end
 
 alba = Proc.new { AlbaPostResource.new(post).serialize }
 alba_inline = Proc.new do
