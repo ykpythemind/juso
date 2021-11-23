@@ -1,12 +1,11 @@
 # Juso
 
-<p align="center" style="max-width: 60%;">
-  <img style="" src="misc/juso.png" alt="juso"/>
-</p>
+<div align="center">
+  <img width="300" src="misc/juso.png" alt="juso"/>
+</div>
 
-Juso is simple, fast and explicit JSON Serializer
-
-<small>Juso means 13 (thirteen) in Japanese</small>
+Juso is simple, fast and explicit JSON Serializer.  
+Juso means 13 (thirteen) in Japanese.
 
 ## Installation
 
@@ -26,9 +25,9 @@ Or install it yourself as:
 
 ## Usage
 
-1. Include `Juso::Serializable`
-2. Define as_juso_json(context) method
-3. Use Juso.generate(object) method
+1. Include `Juso::Serializable` to your class.
+2. Define as_juso_json(context) method.
+3. Use Juso.generate(object) method to generate json.
 
 ```ruby
 class User < ApplicationRecord
