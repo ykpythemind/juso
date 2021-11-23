@@ -103,7 +103,7 @@ class Post
   include ::Juso::Serializable
 
   def juso_json(context)
-    {id: id, body: body, commenter_names: commenter_names, commenters: comments.to_a}
+    {id: id, body: body, commenter_names: commenter_names, comments: comments.to_a}
   end
 end
 
