@@ -7,6 +7,8 @@ require 'json'
 module Juso
   class Error < StandardError; end
 
+  COLLECTION_CLASSES = defined?(ActiveRecord) ? [Array, ActiveRecord::Relation] : [Array]
+
   module Serializable
     def juso_json(_)
       nil
@@ -32,8 +34,6 @@ module Juso
     case object
     when nil, Numeric, String
       return object
-    when Array
-      return object.map { |o| _generate(o, context) }
     when Hash
       return object.each_with_object({}) do |(k, v), acc|
         acc[k] = _generate(v, context)
@@ -41,6 +41,8 @@ module Juso
     when Serializable
       # class比較するの遅い？
       return _generate(object.juso_json(context), context)
+    when *COLLECTION_CLASSES
+      return object.to_a.map { |o| _generate(o, context) }
     else
       # puts object
       # binding.irb

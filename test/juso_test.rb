@@ -6,10 +6,10 @@ class JusoTest < Minitest::Test
   class User
     include Juso::Serializable
 
-    def initialize(id:, nickname:)
+    def initialize(id:, nickname:, email:)
       @id = id
       @nickname = nickname
-      @email = 'always_secret@example.com'
+      @email = email
     end
 
     def juso_json(context)
@@ -44,8 +44,14 @@ class JusoTest < Minitest::Test
     end
   end
 
+  class UserWithoutJuso
+  end
+
   def setup
-    @users = [User.new(id: 1, nickname: 'ykpythemind'), User.new(id: 2, nickname: 'hogefuga')]
+    @users = [
+      User.new(id: 1, nickname: 'ykpythemind', email: 'ykpy@example.com'),
+      User.new(id: 2, nickname: 'hogefuga', email: 'fuga@example.com'),
+    ]
 
     @team = Team.new(id: 1, name: 'strong team', users: @users)
   end
@@ -65,11 +71,32 @@ class JusoTest < Minitest::Test
   def test_juso_context
     context = Juso::Context.new(serializer_type: :admin)
 
-    expected = '{"id":1,"nickname":"ykpythemind","email":"always_secret@example.com"}'
+    expected = '{"id":1,"nickname":"ykpythemind","email":"ykpy@example.com"}'
 
     assert_equal expected, Juso.generate(@users[0], context: context)
 
-    all = Juso.generate(@users, context: context)
-    puts all
+    all = JSON.parse(Juso.generate(@users, context: context))
+    assert_equal ['ykpy@example.com', 'fuga@example.com'], all.map { _1['email'] }
+  end
+
+  def test_serialize_error
+    user = UserWithoutJuso.new
+
+    err = assert_raises(Juso::Error) do
+      Juso.generate(user)
+    end
+
+    assert_match /you must include Juso::Serializable/, err.message
+  end
+
+  def test_number
+    h = {
+      a: 1,
+      b: -100,
+      c: 10.01
+    }
+
+    json = Juso.generate(h)
+    puts json
   end
 end
