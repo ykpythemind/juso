@@ -3,6 +3,7 @@
 require_relative "juso/version"
 
 require 'json'
+require 'date'
 
 module Juso
   class Error < StandardError; end
@@ -41,9 +42,11 @@ module Juso
       return _generate(object.as_juso_json(context), context)
     when *collection_classes
       return object.to_a.map { |o| _generate(o, context) }
+    when *date_classes
+      return object.iso8601
     else
-      # puts object
-      # binding.irb
+      # TODO: fallback to respond_to?(:as_juso_json) and warn?
+
       raise Error.new("cannot serialize object: #{object}. you must include Juso::Serializable")
     end
   end
@@ -59,6 +62,15 @@ module Juso
       else
         [Array]
       end
+  end
+
+  def self.date_classes
+    # TODO: FIX / memorize
+    if defined?(ActiveSupport::TimeWithZone)
+      [Date, DateTime, ActiveSupport::TimeWithZone]
+    else
+      [Date, DateTime]
+    end
   end
 
   reset_collection_classes

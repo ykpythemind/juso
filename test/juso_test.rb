@@ -44,6 +44,18 @@ class JusoTest < Minitest::Test
     end
   end
 
+  class History
+    include Juso::Serializable
+
+    def initialize(time)
+      @time = time
+    end
+
+    def as_juso_json(context)
+      { at: @time }
+    end
+  end
+
   class UserWithoutJuso
   end
 
@@ -98,5 +110,11 @@ class JusoTest < Minitest::Test
 
     json = Juso.generate(h)
     puts json
+  end
+
+  def test_datetime
+    day = DateTime.parse('2001-02-03T04:05:06.123456789+09:00')
+
+    assert_equal '{"at":"2001-02-03T04:05:06+09:00"}', Juso.generate(History.new(day))
   end
 end
