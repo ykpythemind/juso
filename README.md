@@ -20,8 +20,45 @@ Or install it yourself as:
 
 ## Usage
 
-```
+1. include `Juso::Serializable`
+2. define juso_json(context) method
 
+```ruby
+class User
+  include Juso::Serializable
+
+  # ...
+
+  def juso_json(context)
+    h = {
+      id: id,
+      nickname: nickname,
+    }
+
+    if context.serializer_type == :admin
+      h[:email] = email
+    end
+
+    h
+  end
+end
+
+class Team
+  include Juso::Serializable
+
+  # ...
+
+  def juso_json(context)
+    {
+      id: id,
+      name: name,
+      users: users
+    }
+  end
+end
+
+team = Team.first!
+Juso.generate(team)
 ```
 
 ## Development

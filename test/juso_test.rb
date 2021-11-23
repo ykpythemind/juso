@@ -9,13 +9,20 @@ class JusoTest < Minitest::Test
     def initialize(id:, nickname:)
       @id = id
       @nickname = nickname
+      @email = 'always_secret@example.com'
     end
 
-    def juso_json(*)
-      {
+    def juso_json(context)
+      h = {
         id: @id,
         nickname: @nickname,
       }
+
+      if context.serializer_type == :admin
+        h[:email] = @email
+      end
+
+      h
     end
   end
 
@@ -28,7 +35,7 @@ class JusoTest < Minitest::Test
       @users = users
     end
 
-    def juso_json(*)
+    def juso_json(context)
       {
         id: @id,
         name: @name,
@@ -53,5 +60,16 @@ class JusoTest < Minitest::Test
     JSON
 
     assert_equal expected.strip, Juso.generate(@team)
+  end
+
+  def test_juso_context
+    context = Juso::Context.new(serializer_type: :admin)
+
+    expected = '{"id":1,"nickname":"ykpythemind","email":"always_secret@example.com"}'
+
+    assert_equal expected, Juso.generate(@users[0], context: context)
+
+    all = Juso.generate(@users, context: context)
+    puts all
   end
 end

@@ -16,9 +16,11 @@ module Juso
   # Juso Context is serializer context
   # xxxxx
   class Context
-    def initialize(options: nil)
-      @options = options
+    def initialize(serializer_type: :default)
+      @serializer_type = serializer_type.to_sym
     end
+
+    attr_reader :serializer_type
   end
 
   def self.generate(object, context: Context.new)
