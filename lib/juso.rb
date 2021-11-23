@@ -10,7 +10,7 @@ module Juso
   COLLECTION_CLASSES = defined?(ActiveRecord) ? [Array, ActiveRecord::Relation] : [Array]
 
   module Serializable
-    def juso_json(_)
+    def as_juso_json(_)
       nil
     end
   end
@@ -40,7 +40,7 @@ module Juso
       end
     when Serializable
       # class比較するの遅い？
-      return _generate(object.juso_json(context), context)
+      return _generate(object.as_juso_json(context), context)
     when *COLLECTION_CLASSES
       return object.to_a.map { |o| _generate(o, context) }
     else

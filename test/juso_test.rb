@@ -12,7 +12,7 @@ class JusoTest < Minitest::Test
       @email = email
     end
 
-    def juso_json(context)
+    def as_juso_json(context)
       h = {
         id: @id,
         nickname: @nickname,
@@ -35,7 +35,7 @@ class JusoTest < Minitest::Test
       @users = users
     end
 
-    def juso_json(context)
+    def as_juso_json(context)
       {
         id: @id,
         name: @name,

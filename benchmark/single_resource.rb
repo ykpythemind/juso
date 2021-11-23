@@ -94,7 +94,7 @@ require "juso"
 class Comment
   include ::Juso::Serializable
 
-  def juso_json(context)
+  def as_juso_json(context)
     {id: id, body: body}
   end
 end
@@ -102,7 +102,7 @@ end
 class Post
   include ::Juso::Serializable
 
-  def juso_json(context)
+  def as_juso_json(context)
     {id: id, body: body, commenter_names: commenter_names, comments: comments.to_a}
   end
 end

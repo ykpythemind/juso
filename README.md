@@ -21,7 +21,7 @@ Or install it yourself as:
 ## Usage
 
 1. include `Juso::Serializable`
-2. define juso_json(context) method
+2. define as_juso_json(context) method
 
 ```ruby
 class User
@@ -29,7 +29,7 @@ class User
 
   # ...
 
-  def juso_json(context)
+  def as_juso_json(context)
     h = {
       id: id,
       nickname: nickname,
@@ -48,7 +48,7 @@ class Team
 
   # ...
 
-  def juso_json(context)
+  def as_juso_json(context)
     {
       id: id,
       name: name,
