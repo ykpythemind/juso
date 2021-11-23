@@ -39,7 +39,7 @@ module Juso
         acc[k] = _generate(v, context)
       end
     when Serializable
-      # class比較するの遅い？
+      # respond_to?(:as_juso_json) のほうが良い可能性ある？
       return _generate(object.as_juso_json(context), context)
     when *COLLECTION_CLASSES
       return object.to_a.map { |o| _generate(o, context) }
