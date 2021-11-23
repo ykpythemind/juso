@@ -76,7 +76,7 @@ class JusoTest < Minitest::Test
     assert_equal expected, Juso.generate(@users[0], context: context)
 
     all = JSON.parse(Juso.generate(@users, context: context))
-    assert_equal ['ykpy@example.com', 'fuga@example.com'], all.map { _1['email'] }
+    assert_equal ['ykpy@example.com', 'fuga@example.com'], all.map { |t| t['email'] }
   end
 
   def test_serialize_error
