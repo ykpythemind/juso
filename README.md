@@ -7,6 +7,15 @@
 Juso is simple, fast and explicit JSON Serializer.  
 Juso means 13 (thirteen) in Japanese.
 
+## Motivation
+
+#### Japanese
+
+Juso は as_juso_json というメソッドを定義することでJSON化が可能になります。これは、暗黙的な挙動で非公開にすべき属性が公開されることを防ぎます。RubyのHashやArrayを用いて定義すれば良いので、覚えることが非常に少ないことが特徴です。
+
+また、Ruby on RailsにおいてはModelのクラスにそのまま定義することができるため、初期の導入としてはシンプルでわかりやすいです。
+
+
 ## Installation
 
 Add this line to your application's Gemfile:
