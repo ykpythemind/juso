@@ -84,7 +84,7 @@ as_juso_json メソッドは以下のインスタンスしか返してはいけ�
 
 - Numeric Class
 - String Class
-- Null Class
+- Nil Class
 - Hash Class
 - Array Class
 - Juso::Serializable をinclude したクラス
