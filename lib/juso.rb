@@ -51,6 +51,14 @@ module Juso
     end
   end
 
+  def self.wrap(object, klass)
+    if collection_classes.any? { |arrayish| object.is_a?(arrayish) }
+      object.to_a.map { |obj| klass.new(object) }
+    else
+      klass.new(object)
+    end
+  end
+
   def self.collection_classes
     @collection_classes
   end

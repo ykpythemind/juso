@@ -12,6 +12,8 @@ class JusoTest < Minitest::Test
       @email = email
     end
 
+    attr_reader :nickname, :id, :email
+
     def juso(context)
       h = {
         id: @id,
@@ -28,6 +30,8 @@ class JusoTest < Minitest::Test
 
   class Team
     include Juso::Serializable
+
+    attr_reader :id, :name, :users
 
     def initialize(id:, name:, users:)
       @id = id
@@ -57,6 +61,35 @@ class JusoTest < Minitest::Test
   end
 
   class UserWithoutJuso
+  end
+
+  class TeamSerializer
+    include Juso::Serializable
+
+    def initialize(team)
+      @team = team
+    end
+
+    def juso(context)
+      {
+        users: Juso.wrap(@team.users, UserSerializer),
+        id: @team.id
+      }
+    end
+  end
+
+  class UserSerializer
+    include Juso::Serializable
+
+    def initialize(user)
+      @user = user
+    end
+
+    def juso(context)
+      {
+        name: @user.nickname
+      }
+    end
   end
 
   def setup
@@ -116,5 +149,14 @@ class JusoTest < Minitest::Test
     day = DateTime.parse('2001-02-03T04:05:06.123456789+09:00')
 
     assert_equal '{"at":"2001-02-03T04:05:06+09:00"}', Juso.generate(History.new(day))
+  end
+
+  def test_wrap
+    puts Juso.generate(Juso.wrap(@team, TeamSerializer))
+  end
+
+  def test_array
+    user = @users[0]
+    puts Juso.generate([1, 'a', {b: 'fuga'}, Juso.wrap(user, UserSerializer)])
   end
 end
