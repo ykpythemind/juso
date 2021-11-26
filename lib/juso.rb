@@ -9,7 +9,7 @@ module Juso
   class Error < StandardError; end
 
   module Serializable
-    def as_juso_json(_)
+    def juso(_)
       nil
     end
   end
@@ -38,14 +38,14 @@ module Juso
         acc[k] = _generate(v, context)
       end
     when Serializable
-      # respond_to?(:as_juso_json) のほうが良い可能性ある？
-      return _generate(object.as_juso_json(context), context)
+      # respond_to?(:juso) のほうが良い可能性ある？
+      return _generate(object.juso(context), context)
     when *collection_classes
       return object.to_a.map { |o| _generate(o, context) }
     when *date_classes
       return object.iso8601
     else
-      # TODO: fallback to respond_to?(:as_juso_json) and warn?
+      # TODO: fallback to respond_to?(:juso) and warn?
 
       raise Error.new("cannot serialize object: #{object}. you must include Juso::Serializable")
     end

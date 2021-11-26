@@ -11,7 +11,7 @@ Juso means 13 (thirteen) in Japanese.
 
 #### Japanese
 
-Juso は as_juso_json というメソッドを定義することでJSON化が可能になります。RubyのHashやArrayを用いて定義すれば良いので、覚えることが非常に少ないことが特徴です。また、暗黙的な挙動で非公開にすべき属性が公開されることを防ぎます。
+Juso は juso というメソッドを定義することでJSON化が可能になります。RubyのHashやArrayを用いて定義すれば良いので、覚えることが非常に少ないことが特徴です。また、暗黙的な挙動で非公開にすべき属性が公開されることを防ぎます。
 
 Ruby on RailsにおいてはModelのクラスにそのまま定義することができるため、初期の導入としてはシンプルでわかりやすいです。[^1]
 
@@ -36,7 +36,7 @@ Or install it yourself as:
 ## Usage
 
 1. Include `Juso::Serializable` to your class.
-2. Define as_juso_json(context) method.
+2. Define juso(context) method.
 3. Use Juso.generate(object) method to generate json.
 
 ```ruby
@@ -45,7 +45,7 @@ class User < ApplicationRecord
 
   # ...
 
-  def as_juso_json(context)
+  def juso(context)
     {
       id: id,
       nickname: nickname,
@@ -60,7 +60,7 @@ class Team < ApplicationRecord
 
   # ...
 
-  def as_juso_json(context)
+  def juso(context)
     {
       id: id,
       name: name,
@@ -80,7 +80,7 @@ Juso.generate(team)
 
 #### Japanese
 
-as_juso_json メソッドは以下のインスタンスしか返してはいけません
+juso メソッドは以下のインスタンスしか返してはいけません
 
 - Numeric Class
 - String Class
