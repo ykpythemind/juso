@@ -11,11 +11,11 @@ Juso means 13 (thirteen) in Japanese.
 
 #### Japanese
 
-Juso は juso というメソッドを定義することでJSON化が可能になります。RubyのHashやArrayを用いて定義すれば良いので、覚えることが非常に少ないことが特徴です。また、暗黙的な挙動で非公開にすべき属性が公開されることを防ぎます。
+Juso は juso というメソッドを定義することで JSON 化が可能になります。Ruby の Hash や Array を用いて定義すれば良いので、覚えることが非常に少ないことが特徴です。また、暗黙的な挙動で非公開にすべき属性が公開されることを防ぎます。
 
-Ruby on RailsにおいてはModelのクラスにそのまま定義することができるため、初期の導入としてはシンプルでわかりやすいです。[^1]
+Ruby on Rails においては Model のクラスにそのまま定義することができるため、初期の導入としてはシンプルでわかりやすいです。[^1]
 
-[^1]: as_jsonメソッドで頑張ることもできますが、より宣言的で分かりやすいはずです
+[^1]: as_json メソッドで頑張ることもできますが、より宣言的で分かりやすいはずです
 
 ## Installation
 
@@ -87,10 +87,16 @@ juso メソッドは以下のインスタンスしか返してはいけません
 - Nil Class
 - Hash Class
 - Array Class
-- Juso::Serializable をinclude したクラス
+- Juso::Serializable を include したクラス
 - Date / DateTime / ActiveSupport::TimeWithZone
 
-再帰的にjusoの処理が適用されるため、Arrayの要素やHashのvalueも同様のルールが適用されます
+再帰的に juso の処理が適用されるため、Array の要素や Hash の value も同様のルールが適用されます
+
+### Context
+
+#### Japanese
+
+juso メソッドには Context オブジェクトが渡されます。これによって、Juso.generate から各 juso メソッドにシリアライズのオプションを伝播させることができます
 
 ## Development
 
