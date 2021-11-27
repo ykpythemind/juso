@@ -20,7 +20,7 @@ class JusoTest < Minitest::Test
         nickname: @nickname,
       }
 
-      if context.serializer_type == :admin
+      if context.serializer == :admin
         h[:email] = @email
       end
 
@@ -106,22 +106,20 @@ class JusoTest < Minitest::Test
   end
 
   def test_serialize_json
-    expected = <<-JSON
+    want = <<-JSON
 {"id":1,"name":"strong team","users":[{"id":1,"nickname":"ykpythemind"},{"id":2,"nickname":"hogefuga"}]}
     JSON
 
-    assert_equal expected.strip, Juso.generate(@team)
+    assert_equal want.strip, Juso.generate(@team)
   end
 
   def test_juso_context
-    context = Juso::Context.new(serializer_type: :admin)
+    context = Juso::Context.new(serializer: :admin)
 
-    expected = '{"id":1,"nickname":"ykpythemind","email":"ykpy@example.com"}'
+    want = '[{"id":1,"nickname":"ykpythemind","email":"ykpy@example.com"},{"id":2,"nickname":"hogefuga","email":"fuga@example.com"}]'
+    got = Juso.generate(@users, context: context)
 
-    assert_equal expected, Juso.generate(@users[0], context: context)
-
-    all = JSON.parse(Juso.generate(@users, context: context))
-    assert_equal ['ykpy@example.com', 'fuga@example.com'], all.map { |t| t['email'] }
+    assert_equal want, got
   end
 
   def test_serialize_error
@@ -131,7 +129,7 @@ class JusoTest < Minitest::Test
       Juso.generate(user)
     end
 
-    assert_match /you must include Juso::Serializable/, err.message
+    assert_match(/you must include Juso::Serializable/, err.message)
   end
 
   def test_number
@@ -160,13 +158,17 @@ class JusoTest < Minitest::Test
   end
 
   def test_wrap
-    puts Juso.generate(Juso.wrap(@team, TeamSerializer))
+    want = '{"users":[{"name":"ykpythemind"},{"name":"hogefuga"}],"id":1}'
+    got = Juso.generate(Juso.wrap(@team, TeamSerializer))
+
+    assert_equal want, got
   end
 
   def test_array
     user = @users[0]
     want = '[1,"a",{"b":"fuga"},{"name":"ykpythemind"}]'
     got = Juso.generate([1, 'a', {b: 'fuga'}, Juso.wrap(user, UserSerializer)])
+
     assert_equal want, got
   end
 end

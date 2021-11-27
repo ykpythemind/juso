@@ -17,11 +17,11 @@ module Juso
   # Juso Context is serializer context
   # xxxxx
   class Context
-    def initialize(serializer_type: :default)
-      @serializer_type = serializer_type.to_sym
+    def initialize(serializer: :default)
+      @serializer = serializer
     end
 
-    attr_reader :serializer_type
+    attr_reader :serializer
   end
 
   def self.generate(object, context: Context.new)
@@ -53,7 +53,7 @@ module Juso
 
   def self.wrap(object, klass)
     if collection_classes.any? { |arrayish| object.is_a?(arrayish) }
-      object.to_a.map { |obj| klass.new(object) }
+      object.to_a.map { |obj| klass.new(obj) }
     else
       klass.new(object)
     end
