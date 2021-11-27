@@ -141,8 +141,16 @@ class JusoTest < Minitest::Test
       c: 10.01
     }
 
-    json = Juso.generate(h)
-    puts json
+    assert_equal '{"a":1,"b":-100,"c":10.01}', Juso.generate(h)
+  end
+
+  def test_string
+    h = {
+      a: 'b',
+      'c' => nil
+    }
+
+    assert_equal '{"a":"b","c":null}', Juso.generate(h)
   end
 
   def test_datetime
@@ -157,6 +165,8 @@ class JusoTest < Minitest::Test
 
   def test_array
     user = @users[0]
-    puts Juso.generate([1, 'a', {b: 'fuga'}, Juso.wrap(user, UserSerializer)])
+    want = '[1,"a",{"b":"fuga"},{"name":"ykpythemind"}]'
+    got = Juso.generate([1, 'a', {b: 'fuga'}, Juso.wrap(user, UserSerializer)])
+    assert_equal want, got
   end
 end
