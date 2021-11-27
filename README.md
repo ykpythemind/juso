@@ -85,6 +85,8 @@ juso メソッドは以下のインスタンスしか返してはいけません
 - Numeric Class
 - String Class
 - Nil Class
+- True Class
+- False Class
 - Hash Class
 - Array Class
 - Juso::Serializable を include したクラス

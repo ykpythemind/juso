@@ -74,6 +74,7 @@ GEM
       activesupport (>= 5.0)
     i18n (1.8.11)
       concurrent-ruby (~> 1.0)
+    json_expressions (0.9.0)
     loofah (2.12.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
@@ -164,6 +165,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  json_expressions
   juso!
   minitest (~> 5.0)
   rails (~> 6.1.4)

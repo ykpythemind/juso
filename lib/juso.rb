@@ -34,7 +34,7 @@ module Juso
   # generate returns hash (as json)
   def self._g(object, context)
     case object
-    when nil, Numeric, String
+    when nil, Numeric, String, true, false
       return object
     when Hash
       return object.each_with_object({}) do |(k, v), acc|

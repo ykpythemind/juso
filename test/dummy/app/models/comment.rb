@@ -11,7 +11,7 @@ class Comment < ApplicationRecord
       id: id,
       body: body,
       user: user,
-      post_id: post_id,
+      anonymous: anonymous,
     }
   end
 end
