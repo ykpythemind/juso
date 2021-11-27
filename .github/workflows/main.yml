@@ -22,3 +22,8 @@ jobs:
 
       - name: Run test
         run: bundle exec rake test
+
+      - name: Run test (rails)
+        env:
+          RAILS_TEST: true
+        run: bundle exec rake test
