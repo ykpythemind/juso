@@ -31,3 +31,22 @@ jobs:
         run: |
           bundle exec rails db:setup
           bundle exec rake test
+
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.0.2
+          bundler-cache: true
+
+      - name: Run benchmark (collection)
+        run: ruby benchmark/collection.rb
+
+      - name: Run benchmark (single)
+        run: ruby benchmark/single_resource.rb
