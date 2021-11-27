@@ -11,8 +11,11 @@ class Post < ApplicationRecord
       id: id,
       title: title,
       user: user,
-      comments: comments,
-      created_at: created_at,
+      comment_count: comment_count,
     }
+  end
+
+  def comment_count
+    comments.count
   end
 end

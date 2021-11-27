@@ -58,11 +58,7 @@ class RailsTest < Minitest::Test
         user: {
           id: Integer, name: 'ykpythemind'
         },
-        comments: [
-          { id: 1, body: 'hey, ykpythemind', anonymous: false, user: { id: Integer, name: 'juso' }},
-          { id: 2, body: 'hello, juso', anonymous: true, user: nil },
-        ],
-        created_at: '2021-05-20T10:00:00Z'
+        comment_count: 2,
       },
       {
         id: 2,
@@ -70,16 +66,29 @@ class RailsTest < Minitest::Test
         user: {
           id: Integer, name: 'juso'
         },
-        comments: [],
-        created_at: '2021-05-20T10:00:00Z'
+        comment_count: 0,
       },
     ]
 
     assert_json_match pattern, last_response.body
   end
 
-  # def test_posts
-  # end
+  def test_post_show
+    get "/posts/#{Post.first!.id}"
+    assert last_response.ok?
+
+    puts last_response.body
+
+    pattern = {
+      id: Integer,
+      comments: [
+        { id: 1, body: 'hey, ykpythemind', anonymous: false, user: { id: Integer, name: 'juso' }},
+        { id: 2, body: 'hello, juso', anonymous: true, user: nil },
+      ],
+      created_at: '2021-05-20T10:00:00Z',
+      updated_at: '2021-05-20T10:00:00Z',
+    }
+  end
 
   private
     def app
