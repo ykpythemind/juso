@@ -1,4 +1,4 @@
-# original from https://github.com/okuramasafumi/alba/blob/main/benchmark/single_resource.rb
+# original: https://github.com/okuramasafumi/alba/blob/main/benchmark/collection.rb
 
 # Benchmark script to run varieties of JSON serializers
 # Fetch juso from local, otherwise fetch latest from RubyGems
@@ -13,7 +13,7 @@ gemfile(true) do
 
   gem "active_model_serializers"
   gem "activerecord", "6.1.3"
-  gem 'alba'
+  gem "alba"
   gem "juso", path: '../'
   gem "benchmark-ips"
   gem "benchmark-memory"
@@ -36,7 +36,6 @@ end
 require "pg"
 require "active_record"
 require "active_record/connection_adapters/postgresql_adapter"
-require "active_record/connection_adapters/sqlite3_adapter"
 require "logger"
 require "oj"
 require "sqlite3"
@@ -129,6 +128,8 @@ end
 
 require "active_model_serializers"
 
+ActiveModelSerializers.logger = Logger.new(nil)
+
 class AMSCommentSerializer < ActiveModel::Serializer
   attributes :id, :body
 end
@@ -200,7 +201,6 @@ class JserializerPostSerializer < Jserializer::Base
   end
 end
 
-
 # --- JSONAPI:Serializer serializers / (successor of fast_jsonapi) ---
 
 class JsonApiStandardCommentSerializer
@@ -264,6 +264,7 @@ end
 
 # --- Panko serializers ---
 #
+
 require "panko_serializer"
 
 class PankoCommentSerializer < Panko::Serializer
@@ -302,6 +303,10 @@ class PrimalizePostResource < Primalize::Single
   end
 end
 
+class PrimalizePostsResource < Primalize::Many
+  attributes posts: enumerable(PrimalizePostResource)
+end
+
 # --- Representable serializers ---
 
 require "representable"
@@ -313,13 +318,15 @@ class CommentRepresenter < Representable::Decorator
   property :body
 end
 
-class PostRepresenter < Representable::Decorator
-  include Representable::JSON
+class PostsRepresenter < Representable::Decorator
+  include Representable::JSON::Collection
 
-  property :id
-  property :body
-  property :commenter_names
-  collection :comments
+  items class: Post do
+    property :id
+    property :body
+    property :commenter_names
+    collection :comments
+  end
 
   def commenter_names
     commenters.pluck(:name)
@@ -350,22 +357,23 @@ end
 
 # --- Test data creation ---
 
-post = Post.create!(body: 'post')
-user1 = User.create!(name: 'John')
-user2 = User.create!(name: 'Jane')
-post.comments.create!(commenter: user1, body: 'Comment1')
-post.comments.create!(commenter: user2, body: 'Comment2')
-post.reload
+100.times do |i|
+  post = Post.create!(body: "post#{i}")
+  user1 = User.create!(name: "John#{i}")
+  user2 = User.create!(name: "Jane#{i}")
+  10.times do |n|
+    post.comments.create!(commenter: user1, body: "Comment1_#{i}_#{n}")
+    post.comments.create!(commenter: user2, body: "Comment2_#{i}_#{n}")
+  end
+end
+
+posts = Post.all.to_a
 
 # --- Store the serializers in procs ---
 
-juso = Proc.new do
-  Juso.generate(post)
-end
-
-alba = Proc.new { AlbaPostResource.new(post).serialize }
+alba = Proc.new { AlbaPostResource.new(posts).serialize }
 alba_inline = Proc.new do
-  Alba.serialize(post) do
+  Alba.serialize(posts) do
     attributes :id, :body
     attribute :commenter_names do |post|
       post.commenters.pluck(:name)
@@ -375,18 +383,30 @@ alba_inline = Proc.new do
     end
   end
 end
-ams = Proc.new { AMSPostSerializer.new(post, {}).to_json }
-blueprinter = Proc.new { PostBlueprint.render(post) }
-jbuilder = Proc.new { post.to_builder.target! }
-jserializer = Proc.new { JserializerPostSerializer.new(post).to_json }
-jsonapi = proc { JsonApiStandardPostSerializer.new(post).to_json }
-jsonapi_same_format = proc { JsonApiSameFormatPostSerializer.new(post).to_json }
-panko = proc { PankoPostSerializer.new.serialize_to_json(post) }
-# panko = proc { 'nop' }
-primalize = proc { PrimalizePostResource.new(post).to_json }
-rails = Proc.new { ActiveSupport::JSON.encode(post.serializable_hash(include: :comments)) }
-representable = Proc.new { PostRepresenter.new(post).to_json }
-simple_ams = Proc.new { SimpleAMS::Renderer.new(post, serializer: SimpleAMSPostSerializer).to_json }
+
+juso = Proc.new do
+  Juso.generate(post)
+end
+
+ams = Proc.new { ActiveModelSerializers::SerializableResource.new(posts, {}).as_json }
+blueprinter = Proc.new { PostBlueprint.render(posts) }
+jbuilder = Proc.new do
+  Jbuilder.new do |json|
+    json.array!(posts) do |post|
+      json.post post.to_builder
+    end
+  end.target!
+end
+jserializer = Proc.new { JserializerPostSerializer.new(posts, is_collection: true).to_json }
+jsonapi = proc { JsonApiStandardPostSerializer.new(posts).to_json }
+jsonapi_same_format = proc { JsonApiSameFormatPostSerializer.new(posts).to_json }
+panko = proc { Panko::ArraySerializer.new(posts, each_serializer: PankoPostSerializer).to_json }
+primalize = proc { PrimalizePostsResource.new(posts: posts).to_json }
+rails = Proc.new do
+  ActiveSupport::JSON.encode(posts.map{ |post| post.serializable_hash(include: :comments) })
+end
+representable = Proc.new { PostsRepresenter.new(posts).to_json }
+simple_ams = Proc.new { SimpleAMS::Renderer::Collection.new(posts, serializer: SimpleAMSPostSerializer).to_json }
 
 # --- Execute the serializers to check their output ---
 
