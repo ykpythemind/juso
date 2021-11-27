@@ -385,7 +385,7 @@ alba_inline = Proc.new do
 end
 
 juso = Proc.new do
-  Juso.generate(post)
+  Juso.generate(posts)
 end
 
 ams = Proc.new { ActiveModelSerializers::SerializableResource.new(posts, {}).as_json }
