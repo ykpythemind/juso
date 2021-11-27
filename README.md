@@ -89,8 +89,10 @@ juso メソッドは以下のインスタンスしか返してはいけません
 - False Class
 - Hash Class
 - Array Class
+  - - ActiveRecord::Relation
 - Juso::Serializable を include したクラス
-- Date / DateTime / ActiveSupport::TimeWithZone
+- Date / DateTime
+  - - ActiveSupport::TimeWithZone
 
 再帰的に juso の処理が適用されるため、Array の要素や Hash の value も同様のルールが適用されます
 
@@ -111,8 +113,12 @@ class UserSerializer
   def juso(context)
     {
       id: @user.id,
-      posts: Juso.wrap(@user.posts, PostSerializer), # use PostSerializer#juso method. Each post passes into PostSerializer object.
-      team: @user.team, # use Team#juso method
+
+      # use PostSerializer#juso method. Each post passes into PostSerializer object.
+      posts: Juso.wrap(@user.posts, PostSerializer),
+
+      # use Team#juso method
+      team: @user.team,
     }
   end
 end
