@@ -22,10 +22,10 @@ gemfile(true) do
   gem "jserializer"
   gem "jsonapi-serializer" # successor of fast_jsonapi
   gem "multi_json"
-  # gem "panko_serializer"
+  gem "panko_serializer"
   # gem "pg"
   gem "primalize"
-  # gem "oj"
+  gem "oj"
   gem "representable"
   gem "simple_ams"
   gem "sqlite3"
@@ -38,9 +38,9 @@ require "active_record"
 # require "active_record/connection_adapters/postgresql_adapter"
 require "active_record/connection_adapters/sqlite3_adapter"
 require "logger"
-# require "oj"
+require "oj"
 require "sqlite3"
-# Oj.optimize_rails
+Oj.optimize_rails
 
 ActiveRecord::Base.establish_connection(adapter: "sqlite3", database: ":memory:")
 # ActiveRecord::Base.logger = Logger.new($stdout)
@@ -264,22 +264,22 @@ end
 
 # --- Panko serializers ---
 #
-# require "panko_serializer"
-#
-# class PankoCommentSerializer < Panko::Serializer
-#   attributes :id, :body
-# end
-#
-#
-# class PankoPostSerializer < Panko::Serializer
-#   attributes :id, :body, :commenter_names
-#
-#   has_many :comments, serializer: PankoCommentSerializer
-#
-#   def commenter_names
-#     object.comments.pluck(:name)
-#   end
-# end
+require "panko_serializer"
+
+class PankoCommentSerializer < Panko::Serializer
+  attributes :id, :body
+end
+
+
+class PankoPostSerializer < Panko::Serializer
+  attributes :id, :body, :commenter_names
+
+  has_many :comments, serializer: PankoCommentSerializer
+
+  def commenter_names
+    object.comments.pluck(:name)
+  end
+end
 
 # --- Primalize serializers ---
 #
@@ -383,8 +383,8 @@ jbuilder = Proc.new { post.to_builder.target! }
 jserializer = Proc.new { JserializerPostSerializer.new(post).to_json }
 jsonapi = proc { JsonApiStandardPostSerializer.new(post).to_json }
 jsonapi_same_format = proc { JsonApiSameFormatPostSerializer.new(post).to_json }
-# panko = proc { PankoPostSerializer.new.serialize_to_json(post) }
-panko = proc { 'nop' }
+panko = proc { PankoPostSerializer.new.serialize_to_json(post) }
+# panko = proc { 'nop' }
 primalize = proc { PrimalizePostResource.new(post).to_json }
 rails = Proc.new { ActiveSupport::JSON.encode(post.serializable_hash(include: :comments)) }
 representable = Proc.new { PostRepresenter.new(post).to_json }
