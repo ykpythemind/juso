@@ -102,9 +102,38 @@ juso メソッドには Context オブジェクトが渡されます。これに
 
 ### Juso.wrap
 
+```ruby
+class UserSerializer
+  include Juso::Serializable
+
+  # ...
+
+  def juso(context)
+    {
+      id: @user.id,
+      posts: Juso.wrap(@user.posts, PostSerializer), # use PostSerializer#juso method. Each post passes into PostSerializer object.
+      team: @user.team, # use Team#juso method
+    }
+  end
+end
+
+class PostSerializer
+  include Juso::Serializable
+
+  def initialize(post)
+    @post = post
+  end
+
+  def juso(context)
+    # do something with @post...
+  end
+end
+```
+
 #### Japanese
 
-TODO
+Juso.wrap(object, serializable_class) ユーティリティを使うことで、特定のクラスに処理を委譲できます。
+コード例だと、 @user.posts は Post の ActiveRecord::Relation を返しますが、通常であれば Post インスタンスの juso メソッドが使われるのに対して、各 Post インスタンスを PostSerializer でラップします。PostSerializer#juso メソッドが呼ばれることになります。
 
 ## Development
 
