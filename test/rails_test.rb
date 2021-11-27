@@ -25,11 +25,31 @@ require "rack/test"
 class RailsTest < Minitest::Test
   include Rack::Test::Methods
 
-  def test_rails
+  def setup
+    @user1 = User.create!(name: 'ykpythemind', email: 'ykpythemind@example.com')
+    @user2 = User.create!(name: 'juso', email: 'juso@example.com')
+
+    post1 = Post.create!(user: @user1, title: 'title1')
+    post2 = Post.create!(user: @user2, title: 'title2'),
+
+    post1.comments.create!(body: 'hey, ykpythemind', user: @user2)
+    post1.comments.create!(body: 'hello, juso', user: @user1)
+  end
+
+  def teardown
+    Comment.delete_all
+    Post.delete_all
+    User.delete_all
+  end
+
+  def test_posts
     get "/posts"
     assert last_response.ok?
     puts last_response.body
   end
+
+  # def test_posts
+  # end
 
   private
     def app

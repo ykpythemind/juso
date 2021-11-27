@@ -1,6 +1,7 @@
 class PostsController < ApplicationController
   def index
-    render json: Juso.generate([])
+    posts = Post.all
+    render json: Juso.generate(posts)
   end
 end
 
