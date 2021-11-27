@@ -14,34 +14,35 @@ module Juso
     end
   end
 
-  # Juso Context is serializer context
-  # xxxxx
+  # Juso::Context is serializer context
   class Context
-    def initialize(serializer: :default)
+    def initialize(serializer: :default, options: {})
       @serializer = serializer
+      @options = options
     end
 
-    attr_reader :serializer
+    attr_reader :serializer, :options
   end
 
+  # Juso.generate generates json string
   def self.generate(object, context: Context.new)
-    JSON.fast_generate(_generate(object, context))
+    JSON.fast_generate(_g(object, context))
   end
 
   # generate returns hash (as json)
-  def self._generate(object, context)
+  def self._g(object, context)
     case object
     when nil, Numeric, String
       return object
     when Hash
       return object.each_with_object({}) do |(k, v), acc|
-        acc[k] = _generate(v, context)
+        acc[k] = _g(v, context)
       end
     when Serializable
       # respond_to?(:juso) のほうが良い可能性ある？
-      return _generate(object.juso(context), context)
+      return _g(object.juso(context), context)
     when *collection_classes
-      return object.to_a.map { |o| _generate(o, context) }
+      return object.to_a.map { |o| _g(o, context) }
     when *date_classes
       return object.iso8601
     else
@@ -51,6 +52,7 @@ module Juso
     end
   end
 
+  # Juso.wrap is utility for wrapping object with Juso::Serializable class
   def self.wrap(object, klass)
     if collection_classes.any? { |arrayish| object.is_a?(arrayish) }
       object.to_a.map { |o| klass.new(o) }
@@ -82,4 +84,6 @@ module Juso
       [Date, DateTime]
     end
   end
+
+  private_class_method :default_collection_classes, :default_date_classes, :_g
 end
