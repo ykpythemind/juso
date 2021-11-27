@@ -8,5 +8,5 @@
 /tmp/
 
 test/dummy/log/*.log
-test/db/development.sqlite3
-test/db/test.sqlite3
+test/dummy/db/development.sqlite3
+test/dummy/db/test.sqlite3
