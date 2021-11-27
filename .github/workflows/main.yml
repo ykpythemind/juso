@@ -45,5 +45,8 @@ jobs:
           ruby-version: 3.0.2
           bundler-cache: true
 
-      - name: Run benchmark
+      - name: Run benchmark (collection)
+        run: ruby benchmark/collection.rb
+
+      - name: Run benchmark (single)
         run: ruby benchmark/single_resource.rb
