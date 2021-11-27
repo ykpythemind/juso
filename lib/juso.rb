@@ -16,7 +16,9 @@ module Juso
 
   # Juso::Context is serializer context
   class Context
-    def initialize(serializer: :default, options: {})
+    DEFAULT_OPTS = {}.freeze
+
+    def initialize(serializer: :default, options: DEFAULT_OPTS)
       @serializer = serializer
       @options = options
     end
@@ -67,7 +69,7 @@ module Juso
 
   def self.default_collection_classes
     if defined?(ActiveRecord)
-      [Array, ActiveRecord::Relation, ActiveRecord::Associations::CollectionProxy]
+      [Array, ActiveRecord::Relation]
     else
       [Array]
     end
