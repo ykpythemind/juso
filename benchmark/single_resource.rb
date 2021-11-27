@@ -23,7 +23,7 @@ gemfile(true) do
   gem "jsonapi-serializer" # successor of fast_jsonapi
   gem "multi_json"
   gem "panko_serializer"
-  # gem "pg"
+  gem "pg"
   gem "primalize"
   gem "oj"
   gem "representable"
@@ -33,9 +33,9 @@ end
 
 # --- Test data model setup ---
 
-# require "pg"
+require "pg"
 require "active_record"
-# require "active_record/connection_adapters/postgresql_adapter"
+require "active_record/connection_adapters/postgresql_adapter"
 require "active_record/connection_adapters/sqlite3_adapter"
 require "logger"
 require "oj"
