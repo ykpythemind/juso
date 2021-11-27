@@ -85,9 +85,12 @@ class RailsTest < Minitest::Test
         { id: 1, body: 'hey, ykpythemind', anonymous: false, user: { id: Integer, name: 'juso' }},
         { id: 2, body: 'hello, juso', anonymous: true, user: nil },
       ],
+      user: { id: Integer, name: 'ykpythemind' },
       created_at: '2021-05-20T10:00:00Z',
       updated_at: '2021-05-20T10:00:00Z',
     }
+
+    assert_json_match pattern, last_response.body
   end
 
   private
