@@ -90,13 +90,11 @@ end
 # --- Juso serializers ---
 
 require "juso"
-require 'active_record' # hack for CollectionProxy
-Juso.reset_collection_classes
 
 class Comment
   include ::Juso::Serializable
 
-  def as_juso_json(context)
+  def juso(context)
     {id: id, body: body}
   end
 end
@@ -104,7 +102,7 @@ end
 class Post
   include ::Juso::Serializable
 
-  def as_juso_json(context)
+  def juso(context)
     {id: id, body: body, commenter_names: commenter_names, comments: comments}
   end
 end

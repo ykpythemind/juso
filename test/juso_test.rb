@@ -12,13 +12,15 @@ class JusoTest < Minitest::Test
       @email = email
     end
 
-    def as_juso_json(context)
+    attr_reader :nickname, :id, :email
+
+    def juso(context)
       h = {
         id: @id,
         nickname: @nickname,
       }
 
-      if context.serializer_type == :admin
+      if context.serializer == :admin
         h[:email] = @email
       end
 
@@ -29,13 +31,15 @@ class JusoTest < Minitest::Test
   class Team
     include Juso::Serializable
 
+    attr_reader :id, :name, :users
+
     def initialize(id:, name:, users:)
       @id = id
       @name = name
       @users = users
     end
 
-    def as_juso_json(context)
+    def juso(context)
       {
         id: @id,
         name: @name,
@@ -51,12 +55,41 @@ class JusoTest < Minitest::Test
       @time = time
     end
 
-    def as_juso_json(context)
+    def juso(context)
       { at: @time }
     end
   end
 
   class UserWithoutJuso
+  end
+
+  class TeamSerializer
+    include Juso::Serializable
+
+    def initialize(team)
+      @team = team
+    end
+
+    def juso(context)
+      {
+        users: Juso.wrap(@team.users, UserSerializer),
+        id: @team.id
+      }
+    end
+  end
+
+  class UserSerializer
+    include Juso::Serializable
+
+    def initialize(user)
+      @user = user
+    end
+
+    def juso(context)
+      {
+        name: @user.nickname
+      }
+    end
   end
 
   def setup
@@ -73,22 +106,20 @@ class JusoTest < Minitest::Test
   end
 
   def test_serialize_json
-    expected = <<-JSON
+    want = <<-JSON
 {"id":1,"name":"strong team","users":[{"id":1,"nickname":"ykpythemind"},{"id":2,"nickname":"hogefuga"}]}
     JSON
 
-    assert_equal expected.strip, Juso.generate(@team)
+    assert_equal want.strip, Juso.generate(@team)
   end
 
   def test_juso_context
-    context = Juso::Context.new(serializer_type: :admin)
+    context = Juso::Context.new(serializer: :admin)
 
-    expected = '{"id":1,"nickname":"ykpythemind","email":"ykpy@example.com"}'
+    want = '[{"id":1,"nickname":"ykpythemind","email":"ykpy@example.com"},{"id":2,"nickname":"hogefuga","email":"fuga@example.com"}]'
+    got = Juso.generate(@users, context: context)
 
-    assert_equal expected, Juso.generate(@users[0], context: context)
-
-    all = JSON.parse(Juso.generate(@users, context: context))
-    assert_equal ['ykpy@example.com', 'fuga@example.com'], all.map { |t| t['email'] }
+    assert_equal want, got
   end
 
   def test_serialize_error
@@ -98,7 +129,7 @@ class JusoTest < Minitest::Test
       Juso.generate(user)
     end
 
-    assert_match /you must include Juso::Serializable/, err.message
+    assert_match(/you must include Juso::Serializable/, err.message)
   end
 
   def test_number
@@ -108,13 +139,36 @@ class JusoTest < Minitest::Test
       c: 10.01
     }
 
-    json = Juso.generate(h)
-    puts json
+    assert_equal '{"a":1,"b":-100,"c":10.01}', Juso.generate(h)
+  end
+
+  def test_string
+    h = {
+      a: 'b',
+      'c' => nil
+    }
+
+    assert_equal '{"a":"b","c":null}', Juso.generate(h)
   end
 
   def test_datetime
     day = DateTime.parse('2001-02-03T04:05:06.123456789+09:00')
 
     assert_equal '{"at":"2001-02-03T04:05:06+09:00"}', Juso.generate(History.new(day))
+  end
+
+  def test_wrap
+    want = '{"users":[{"name":"ykpythemind"},{"name":"hogefuga"}],"id":1}'
+    got = Juso.generate(Juso.wrap(@team, TeamSerializer))
+
+    assert_equal want, got
+  end
+
+  def test_array
+    user = @users[0]
+    want = '[1,"a",{"b":"fuga"},{"name":"ykpythemind"}]'
+    got = Juso.generate([1, 'a', {b: 'fuga'}, Juso.wrap(user, UserSerializer)])
+
+    assert_equal want, got
   end
 end

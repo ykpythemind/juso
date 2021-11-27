@@ -11,11 +11,11 @@ Juso means 13 (thirteen) in Japanese.
 
 #### Japanese
 
-Juso は as_juso_json というメソッドを定義することでJSON化が可能になります。RubyのHashやArrayを用いて定義すれば良いので、覚えることが非常に少ないことが特徴です。また、暗黙的な挙動で非公開にすべき属性が公開されることを防ぎます。
+Juso は juso というメソッドを定義することで JSON 化が可能になります。Ruby の Hash や Array を用いて定義すれば良いので、覚えることが非常に少ないことが特徴です。また、暗黙的な挙動で非公開にすべき属性が公開されることを防ぎます。
 
-Ruby on RailsにおいてはModelのクラスにそのまま定義することができるため、初期の導入としてはシンプルでわかりやすいです。[^1]
+Ruby on Rails においては Model のクラスにそのまま定義することができるため、初期の導入としてはシンプルでわかりやすいです。[^1]
 
-[^1]: as_jsonメソッドで頑張ることもできますが、より宣言的で分かりやすいはずです
+[^1]: as_json メソッドで頑張ることもできますが、より宣言的で分かりやすいはずです
 
 ## Installation
 
@@ -36,7 +36,7 @@ Or install it yourself as:
 ## Usage
 
 1. Include `Juso::Serializable` to your class.
-2. Define as_juso_json(context) method.
+2. Define juso(context) method.
 3. Use Juso.generate(object) method to generate json.
 
 ```ruby
@@ -45,7 +45,7 @@ class User < ApplicationRecord
 
   # ...
 
-  def as_juso_json(context)
+  def juso(context)
     {
       id: id,
       nickname: nickname,
@@ -60,7 +60,7 @@ class Team < ApplicationRecord
 
   # ...
 
-  def as_juso_json(context)
+  def juso(context)
     {
       id: id,
       name: name,
@@ -80,17 +80,60 @@ Juso.generate(team)
 
 #### Japanese
 
-as_juso_json メソッドは以下のインスタンスしか返してはいけません
+juso メソッドは以下のインスタンスしか返してはいけません
 
 - Numeric Class
 - String Class
 - Nil Class
+- True Class
+- False Class
 - Hash Class
 - Array Class
-- Juso::Serializable をinclude したクラス
+- Juso::Serializable を include したクラス
 - Date / DateTime / ActiveSupport::TimeWithZone
 
-再帰的にjusoの処理が適用されるため、Arrayの要素やHashのvalueも同様のルールが適用されます
+再帰的に juso の処理が適用されるため、Array の要素や Hash の value も同様のルールが適用されます
+
+### Juso::Context
+
+#### Japanese
+
+juso メソッドには Context オブジェクトが渡されます。これによって、Juso.generate から各 juso メソッドにシリアライズのオプションを伝播させることができます
+
+### Juso.wrap
+
+```ruby
+class UserSerializer
+  include Juso::Serializable
+
+  # ...
+
+  def juso(context)
+    {
+      id: @user.id,
+      posts: Juso.wrap(@user.posts, PostSerializer), # use PostSerializer#juso method. Each post passes into PostSerializer object.
+      team: @user.team, # use Team#juso method
+    }
+  end
+end
+
+class PostSerializer
+  include Juso::Serializable
+
+  def initialize(post)
+    @post = post
+  end
+
+  def juso(context)
+    # do something with @post...
+  end
+end
+```
+
+#### Japanese
+
+Juso.wrap(object, serializable_class) ユーティリティを使うことで、特定のクラスに処理を委譲できます。
+コード例だと、 @user.posts は Post の ActiveRecord::Relation を返しますが、通常であれば Post インスタンスの juso メソッドが使われるのに対して、各 Post インスタンスを PostSerializer でラップします。PostSerializer#juso メソッドが呼ばれることになります。
 
 ## Development
 

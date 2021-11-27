@@ -6,11 +6,17 @@ require "rake/testtask"
 Rake::TestTask.new(:test) do |t|
   t.libs << "test"
   t.libs << "lib"
-  t.test_files = FileList["test/**/*_test.rb"]
+
+  files = FileList["test/juso_test.rb"]
+
+  if ENV['RAILS_TEST']
+    files << 'test/rails_test.rb'
+  end
+
+  t.test_files = files
 end
 
-require "rubocop/rake_task"
+# require "rubocop/rake_task"
+# RuboCop::RakeTask.new
 
-RuboCop::RakeTask.new
-
-task default: %i[test rubocop]
+task default: %i[test]
