@@ -94,11 +94,17 @@ juso メソッドは以下のインスタンスしか返してはいけません
 
 再帰的に juso の処理が適用されるため、Array の要素や Hash の value も同様のルールが適用されます
 
-### Context
+### Juso::Context
 
 #### Japanese
 
 juso メソッドには Context オブジェクトが渡されます。これによって、Juso.generate から各 juso メソッドにシリアライズのオプションを伝播させることができます
+
+### Juso.wrap
+
+#### Japanese
+
+TODO
 
 ## Development
 
