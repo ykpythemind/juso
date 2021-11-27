@@ -28,11 +28,7 @@ module Juso
 
   # Juso.generate generates json string
   def self.generate(object, context: Context.new)
-    if defined?(Oj)
-      Oj.dump(_g(object, context))
-    else
-      JSON.fast_generate(_g(object, context))
-    end
+    JSON.fast_generate(_g(object, context))
   end
 
   # generate returns hash (as json)
