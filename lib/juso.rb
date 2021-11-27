@@ -53,33 +53,33 @@ module Juso
 
   def self.wrap(object, klass)
     if collection_classes.any? { |arrayish| object.is_a?(arrayish) }
-      object.to_a.map { |obj| klass.new(obj) }
+      object.to_a.map { |o| klass.new(o) }
     else
       klass.new(object)
     end
   end
 
   def self.collection_classes
-    @collection_classes
+    @collection_classes ||= default_collection_classes
   end
 
-  def self.reset_collection_classes
-    @collection_classes =
-      if defined?(ActiveRecord)
-        [Array, ActiveRecord::Relation, ActiveRecord::Associations::CollectionProxy]
-      else
-        [Array]
-      end
+  def self.default_collection_classes
+    if defined?(ActiveRecord)
+      [Array, ActiveRecord::Relation, ActiveRecord::Associations::CollectionProxy]
+    else
+      [Array]
+    end
   end
 
   def self.date_classes
-    # TODO: FIX / memorize
+    @date_classes ||= default_date_classes
+  end
+
+  def self.default_date_classes
     if defined?(ActiveSupport::TimeWithZone)
       [Date, DateTime, ActiveSupport::TimeWithZone]
     else
       [Date, DateTime]
     end
   end
-
-  reset_collection_classes
 end

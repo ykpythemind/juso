@@ -90,8 +90,6 @@ end
 # --- Juso serializers ---
 
 require "juso"
-require 'active_record' # hack for CollectionProxy
-Juso.reset_collection_classes
 
 class Comment
   include ::Juso::Serializable
