@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    juso (1.0.0)
+    juso (1.0.2)
 
 GEM
   remote: https://rubygems.org/
