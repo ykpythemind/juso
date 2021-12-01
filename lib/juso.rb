@@ -27,11 +27,11 @@ module Juso
   end
 
   # Juso.generate generates json string
-  def self.generate(object, context: Context.new)
+  def self.generate(object, context = Context.new)
     JSON.fast_generate(_g(object, context))
   end
 
-  # generate returns hash (as json)
+  # generate returns object (as json)
   def self._g(object, context)
     case object
     when nil, Numeric, String, true, false
@@ -46,7 +46,7 @@ module Juso
     when *collection_classes
       return object.to_a.map { |o| _g(o, context) }
     when *date_classes
-      return object.iso8601
+      return object.iso8601(context.options[:juso_time_n_digits] || 0)
     else
       # TODO: fallback to respond_to?(:juso) and warn?
 
@@ -87,5 +87,5 @@ module Juso
     end
   end
 
-  private_class_method :default_collection_classes, :default_date_classes, :_g
+  private_class_method :default_collection_classes, :default_date_classes
 end

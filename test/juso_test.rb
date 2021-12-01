@@ -117,7 +117,7 @@ class JusoTest < Minitest::Test
     context = Juso::Context.new(serializer: :admin)
 
     want = '[{"id":1,"nickname":"ykpythemind","email":"ykpy@example.com"},{"id":2,"nickname":"hogefuga","email":"fuga@example.com"}]'
-    got = Juso.generate(@users, context: context)
+    got = Juso.generate(@users, context)
 
     assert_equal want, got
   end
@@ -155,6 +155,8 @@ class JusoTest < Minitest::Test
     day = DateTime.parse('2001-02-03T04:05:06.123456789+09:00')
 
     assert_equal '{"at":"2001-02-03T04:05:06+09:00"}', Juso.generate(History.new(day))
+
+    assert_equal '{"at":"2001-02-03T04:05:06.123+09:00"}', Juso.generate(History.new(day), Juso::Context.new(options: {juso_time_n_digits: 3}))
   end
 
   def test_wrap
