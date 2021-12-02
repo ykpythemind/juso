@@ -80,15 +80,15 @@ Juso.generate(team)
 
 #### Japanese
 
-juso メソッドは以下のインスタンスしか返してはいけません
+juso メソッドは以下のクラスのインスタンスしか返してはいけません
 
-- Numeric Class
-- String Class
-- Nil Class
-- True Class
-- False Class
-- Hash Class
-- Array Class
+- Numeric
+- String
+- NilClass
+- TrueClass
+- FalseClass
+- Hash
+- Array
   - - ActiveRecord::Relation
 - Juso::Serializable を include したクラス
 - Date / DateTime
