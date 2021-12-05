@@ -89,10 +89,10 @@ juso メソッドは以下のクラスのインスタンスしか返してはい
 - FalseClass
 - Hash
 - Array
-  - - ActiveRecord::Relation
+  - \+ ActiveRecord::Relation (ActiveRecord gemが有効である場合)
 - Juso::Serializable を include したクラス
 - Date / DateTime
-  - - ActiveSupport::TimeWithZone
+  - \+ ActiveSupport::TimeWithZone (ActiveSupport gemが有効である場合)
 
 再帰的に juso の処理が適用されるため、Array の要素や Hash の value も同様のルールが適用されます
 
